@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@v4       
       # GWT 2.8.2 ve eski Gradle eklentileri Java 11+ üzerinde kararsız çalışır.
       # Temiz bir JavaScript derlemesi (Production Build) için projenin uyumlu olduğu JDK 8 kurulur.
        Kakao/Java entegrasyonu ve kararlı GWT derlemesi için en güvenli sürümdür.
