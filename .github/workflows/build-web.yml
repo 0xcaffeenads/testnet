@@ -1,0 +1,39 @@
+name: Build and Package Web Sürüm
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # GWT 2.8.2 ve eski Gradle eklentileri Java 11+ üzerinde kararsız çalışır.
+      # Temiz bir JavaScript derlemesi (Production Build) için projenin uyumlu olduğu JDK 8 kurulur.
+       Kakao/Java entegrasyonu ve kararlı GWT derlemesi için en güvenli sürümdür.
+      - name: Set up JDK 8 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      # GWT SuperDevMode / Geliştirme modu bağımlılıklarını tamamen kıran,
+      # Kod sunucusu (CodeServer) ihtiyacını yok eden üretim modu derlemesi.
+      # Temiz ve optimize edilmiş tek parça JavaScript + Varlık (Asset) paketini hazırlar.
+      - name: Compile and Minify Java to Web JavaScript (GWT Production Build)
+        run: ./gradlew html:dist --no-daemon
+
+      # Derlenen canlı sürüm paketini Actions yapay nesnesi (artifact) olarak yüklüyoruz.
+      # Bu klasörün içindeki dosyaları doğrudan Vite projenizin /public/game klasörüne taşıyacaksınız.
+      - name: Upload GWT Web Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixel-dungeon-production-web
+          path: html/build/dist/
