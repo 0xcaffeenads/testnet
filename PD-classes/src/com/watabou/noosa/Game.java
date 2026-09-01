@@ -134,7 +134,12 @@ public abstract class Game<GameActionType> implements ApplicationListener {
 		NoosaScript.get().resetCamera();
 		Gdx.gl.glScissor( 0, 0, width, height );
 		Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
-		draw();
+		try {
+			draw();
+		} catch (Throwable e) {
+			System.out.println( "DEBUG draw() FAILED: " + e );
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -193,13 +198,21 @@ public abstract class Game<GameActionType> implements ApplicationListener {
 			requestedReset = false;
 			try {
 				requestedScene = ClassReflection.newInstance(sceneClass);
+				System.out.println( "DEBUG scene instance created: " + requestedScene );
 				switchScene();
-			} catch (Exception e) {
+				System.out.println( "DEBUG switchScene() OK, scene=" + scene );
+			} catch (Throwable e) {
+				System.out.println( "DEBUG scene creation FAILED: " + e );
 				e.printStackTrace();
 			}
 		}
 		
-		update();
+		try {
+			update();
+		} catch (Throwable e) {
+			System.out.println( "DEBUG update() FAILED: " + e );
+			e.printStackTrace();
+		}
 	}
 	
 	protected void draw() {
