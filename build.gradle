@@ -10,7 +10,6 @@ buildscript {
         // classpath 'com.android.tools.build:gradle:0.12.2'
         // classpath 'com.github.jtakakura:gradle-robovm-plugin:0.0.10'
         classpath 'org.wisepersist:gwt-gradle-plugin:1.0.13'
-        classpath 'org.gretty:gretty:3.0.2'
     }
 }
 
@@ -78,7 +77,6 @@ project(":html") {
     apply plugin: "java-library"
     apply plugin: "gwt"
     apply plugin: "war"
-    apply plugin: "org.gretty"
 
 
     dependencies {
