@@ -25,7 +25,7 @@ allprojects {
         appName = 'pixel-dungeon'
         appTitle = 'Pixel Dungeon'
         appId = 'com.watabou.pixeldungeon'
-        gdxVersion = '1.10.1'
+        gdxVersion = '1.10.0'
         roboVMVersion = '2.3.12'
         // gdxControllersVersion = '2.1.0'
     }
