@@ -1,0 +1,79 @@
+name: Build & Deploy Web (Mobile-Playable)
+
+# Builds the game's `html` module (Java -> JavaScript via GWT) and publishes
+# it to GitHub Pages, so it can be opened and played directly from a phone
+# or tablet browser at: https://<user>.github.io/<repo>/
+#
+# No WebAssembly / CheerpJ needed: the html module already compiles the
+# Java source straight to JS via GWT, which runs natively in mobile
+# browsers (Chrome, Safari, etc). This workflow just builds it and ships
+# it to Pages.
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # GWT 2.8.2 + the gwt-gradle-plugin used by the html module are old
+      # and unreliable on JDK 11+; JDK 8 is the version this project was
+      # built against and the one that compiles cleanly.
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      # Compiles Java -> JavaScript (GWT). Output ends up in html/build/dist/
+      - name: Build web (GWT) bundle
+        run: ./gradlew html:dist --no-daemon
+
+      # html:dist already places webapp/index.html at the root alongside the
+      # compiled html/ (JS) folder, so this is playable straight from /.
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p out/web
+          cp -r html/build/dist/* out/web/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

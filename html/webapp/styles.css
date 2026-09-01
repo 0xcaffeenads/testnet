@@ -2,12 +2,27 @@ canvas {
     cursor: default;
     outline: none;
 	display:block;
+	touch-action: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
-body {
+html, body {
     background-color: #1f1d1d;
 	margin: 0px;
 	padding: 0px;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	overscroll-behavior: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#embed-html {
+	width: 100%;
+	height: 100%;
 }
 
 table {
