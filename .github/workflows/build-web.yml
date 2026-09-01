@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4       
       # GWT 2.8.2 ve eski Gradle eklentileri Java 11+ üzerinde kararsız çalışır.
       # Temiz bir JavaScript derlemesi (Production Build) için projenin uyumlu olduğu JDK 8 kurulur.
-       Kakao/Java entegrasyonu ve kararlı GWT derlemesi için en güvenli sürümdür.
+      # Kakao/Java entegrasyonu ve kararlı GWT derlemesi için en güvenli sürümdür.
       - name: Set up JDK 8 (Temurin)
         uses: actions/setup-java@v4
         with:
