@@ -1,0 +1,56 @@
+name: Build
+
+# Linux-only (ubuntu-latest runners use a standard glibc toolchain, so the
+# desktop jar's bundled LWJGL natives work across any glibc-based distro -
+# no Windows/macOS runners needed for this project's purposes).
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # GWT 2.8.2 + the gwt-gradle-plugin used by the html module are old
+      # and unreliable on JDK 11+; JDK 8 is the version this project was
+      # built against and the one that compiles cleanly.
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      # Web build: compiles the game to JavaScript via GWT.
+      # Output ends up in html/build/dist/
+      - name: Build web (GWT) bundle
+        run: ./gradlew html:dist --no-daemon
+
+      # Desktop build: a single self-contained ("fat") jar with all
+      # dependencies and assets baked in. Runs on any Linux distro that
+      # has a JRE installed (glibc handled transparently by the JVM) via:
+      #   java -jar pixel-dungeon-desktop.jar
+      - name: Build desktop (Linux) jar
+        run: ./gradlew desktop:dist --no-daemon
+
+      - name: Rename desktop jar
+        run: |
+          mkdir -p out/desktop
+          cp desktop/build/libs/*.jar out/desktop/pixel-dungeon-desktop.jar
+
+      - name: Upload web build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixel-dungeon-web
+          path: html/build/dist/
+
+      - name: Upload desktop (Linux) jar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixel-dungeon-desktop-linux
+          path: out/desktop/pixel-dungeon-desktop.jar
